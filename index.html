@@ -7,16 +7,22 @@
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
     h2 { color: #2a5d84; }
-    input, textarea, button { padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+    input, textarea, button { padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; font-size: 16px; }
     button { cursor: pointer; background-color: #2a5d84; color: #fff; border: none; border-radius: 5px; }
     button:hover { background-color: #1f4564; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     table, th, td { border: 1px solid #ddd; }
     th, td { padding: 8px; text-align: left; }
     .hidden { display: none; }
-    .inline-input { width: 90%; }
+    .inline-input { width: 90%; font-size: 16px; padding: 6px; }
     .error { color: red; }
     .success { color: green; font-weight: bold; }
+
+    /* Mobile adjustments */
+    @media (max-width: 600px) {
+      input, textarea, button, .inline-input { font-size: 18px; padding: 10px; }
+      table, th, td { font-size: 16px; }
+    }
   </style>
 </head>
 <body>
@@ -35,8 +41,12 @@
   <div id="dashboardDiv" class="hidden">
     <h2 id="welcomeMsg">Welcome </h2>
     
-    <!-- Shop Profile -->
-    <h3>Shop Profile</h3>
+    <!-- Shop Profile with LOG OUT button -->
+    <h3 style="display: flex; justify-content: space-between; align-items: center;">
+      <span>Shop Profile</span>
+      <button id="logoutBtn" style="background-color: red; color: white; padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer;" onclick="logout()">LOG OUT</button>
+    </h3>
+
     <label>Shop Name</label>
     <input type="text" id="shopName">
     <label>Owner Name</label>
@@ -213,6 +223,18 @@
       } else {
         showMessage("productMsg", resp.message, "error");
       }
+    }
+
+    // ======================
+    // LOGOUT
+    // ======================
+    function logout() {
+      currentUser = null;
+      products = [];
+      document.getElementById("dashboardDiv").classList.add("hidden");
+      document.getElementById("loginDiv").classList.remove("hidden");
+      document.getElementById("nationalId").value = "";
+      document.getElementById("password").value = "";
     }
   </script>
 </body>
