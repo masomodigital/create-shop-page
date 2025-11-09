@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,52 +20,40 @@
   </style>
 </head>
 <body>
-
   <!-- Login Form -->
   <div id="loginDiv">
     <h2>Masomo Shopkeeper Login</h2>
-
     <label for="nationalId">National ID</label>
     <input type="text" id="nationalId" placeholder="Enter National ID" required>
-
     <label for="password">Password</label>
     <input type="password" id="password" placeholder="Enter Password" required>
-
     <button onclick="login()">Login</button>
     <div id="loginMsg"></div>
   </div>
 
   <!-- Dashboard -->
   <div id="dashboardDiv" class="hidden">
-    <h2 id="welcomeMsg">Welcome</h2>
-
+    <h2 id="welcomeMsg">Welcome </h2>
+    
     <!-- Shop Profile -->
     <h3>Shop Profile</h3>
-
     <label>Shop Name</label>
     <input type="text" id="shopName">
-
     <label>Owner Name</label>
     <input type="text" id="ownerName" readonly>
-
     <label>Phone</label>
     <input type="text" id="phone" readonly>
-
     <label>WhatsApp Number</label>
     <input type="text" id="whatsapp">
-
     <label>Location</label>
     <input type="text" id="location">
-
     <label>Description</label>
     <textarea id="description" rows="3"></textarea>
-
     <button onclick="saveProfile()">Save Profile</button>
     <div id="profileMsg"></div>
 
     <!-- Products -->
     <h3>Products / Services (Max 10)</h3>
-
     <table id="productsTable">
       <thead>
         <tr>
@@ -78,197 +66,154 @@
       </thead>
       <tbody></tbody>
     </table>
-
     <button onclick="addProduct()">Add New Product</button>
     <div id="productMsg"></div>
   </div>
 
-<script>
-  const WORKER_URL = "https://super-sky-2031.dmaundu02.workers.dev/";
-  let currentUser = null;
-  let products = [];
+  <script>
+    const WORKER_URL = "https://super-sky-2031.dmaundu02.workers.dev/";
+    let currentUser = null;
+    let products = [];
 
-  // Helper
-  function showMessage(elementId, message) {
-    const el = document.getElementById(elementId);
-    el.innerHTML = "<span class='success'>" + message + "</span>";
-    setTimeout(() => { el.innerHTML = ""; }, 2500);
-  }
-
-  // Generic Worker POST
-  async function worker(action, data = {}) {
-    const resp = await fetch(WORKER_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action, ...data })
-    });
-    return resp.json();
-  }
-
-  // =========================
-  // LOGIN
-  // =========================
-  async function login() {
-    const nationalId = document.getElementById("nationalId").value.trim();
-    const password = document.getElementById("password").value.trim();
-
-    if (!nationalId || !password) return;
-    showMessage("loginMsg", "Processing...");
-
-    const resp = await worker("login", { nationalId, password });
-
-    if (resp.success) {
-      currentUser = resp;
-
-      document.getElementById("loginDiv").classList.add("hidden");
-      document.getElementById("dashboardDiv").classList.remove("hidden");
-
-      document.getElementById("welcomeMsg").innerText = "Welcome " + resp.ownerName;
-
-      loadShopProfile();
-      loadProducts();
-    } else {
-      document.getElementById("loginMsg").innerHTML =
-        "<span class='error'>" + resp.message + "</span>";
-    }
-  }
-
-  // =========================
-  // SHOP PROFILE
-  // =========================
-  async function loadShopProfile() {
-    const profile = await worker("getShopProfile", { userId: currentUser.userId });
-
-    document.getElementById("shopName").value = profile.shopName;
-    document.getElementById("ownerName").value = currentUser.ownerName;
-    document.getElementById("phone").value = currentUser.phone;
-    document.getElementById("whatsapp").value = profile.whatsapp;
-    document.getElementById("location").value = profile.location;
-    document.getElementById("description").value = profile.description;
-  }
-
-  async function saveProfile() {
-    const profile = {
-      userId: currentUser.userId,
-      shopName: document.getElementById("shopName").value.trim(),
-      ownerName: currentUser.ownerName,
-      phone: currentUser.phone,
-      whatsapp: document.getElementById("whatsapp").value.trim(),
-      location: document.getElementById("location").value.trim(),
-      description: document.getElementById("description").value.trim()
-    };
-
-    if (!profile.shopName || !profile.location || !profile.description) {
-      document.getElementById("profileMsg").innerHTML =
-        "<span class='error'>Please fill all required fields.</span>";
-      return;
+    function showMessage(elementId, message, type="success") {
+      const el = document.getElementById(elementId);
+      el.innerHTML = `<span class='${type}'>${message}</span>`;
+      setTimeout(() => { el.innerHTML = ""; }, 3000);
     }
 
-    showMessage("profileMsg", "Saving...");
-
-    const resp = await worker("saveShopProfile", { profile });
-
-    if (resp.success) showMessage("profileMsg", resp.message);
-    else document.getElementById("profileMsg").innerHTML = "<span class='error'>" + resp.message + "</span>";
-  }
-
-  // =========================
-  // PRODUCTS
-  // =========================
-  async function loadProducts() {
-    products = await worker("getProducts", { userId: currentUser.userId });
-    renderProducts();
-  }
-
-  function renderProducts() {
-    const tbody = document.querySelector("#productsTable tbody");
-    tbody.innerHTML = "";
-
-    products.forEach(p => {
-      const tr = document.createElement("tr");
-
-      tr.innerHTML = `
-        <td>${p.itemNumber}</td>
-        <td><input class="inline-input" type="text" value="${p.itemName}"
-            onchange="updateProduct(${p.itemNumber}, 'itemName', this.value)"></td>
-
-        <td><input class="inline-input" type="text" value="${p.itemDescription}"
-            onchange="updateProduct(${p.itemNumber}, 'itemDescription', this.value)"></td>
-
-        <td><input class="inline-input" type="number" value="${p.price}"
-            onchange="updateProduct(${p.itemNumber}, 'price', this.value)"></td>
-
-        <td><button onclick="deleteProduct(${p.itemNumber})">Delete</button></td>
-      `;
-
-      tbody.appendChild(tr);
-    });
-  }
-
-  // Add product
-  async function addProduct() {
-    if (products.length >= 10) {
-      document.getElementById("productMsg").innerHTML =
-        "<span class='error'>Maximum 10 products allowed.</span>";
-      return;
+    async function callWorker(payload) {
+      try {
+        const resp = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        return await resp.json();
+      } catch (err) {
+        return { success: false, message: "Network error: " + err.message };
+      }
     }
 
-    const newProduct = {
-      itemNumber: products.length + 1,
-      itemName: "",
-      itemDescription: "",
-      price: ""
-    };
+    // ======================
+    // LOGIN
+    // ======================
+    async function login() {
+      const nationalId = document.getElementById("nationalId").value.trim();
+      const password = document.getElementById("password").value.trim();
+      if (!nationalId || !password) return;
 
-    showMessage("productMsg", "Saving...");
+      showMessage("loginMsg", "Processing...");
 
-    const resp = await worker("saveProduct", {
-      userId: currentUser.userId,
-      product: newProduct
-    });
+      const resp = await callWorker({ action: "login", nationalId, password });
+      if (resp.success) {
+        currentUser = resp;
+        document.getElementById("loginDiv").classList.add("hidden");
+        document.getElementById("dashboardDiv").classList.remove("hidden");
+        document.getElementById("welcomeMsg").innerText = "Welcome " + resp.ownerName;
+        loadShopProfile();
+        loadProducts();
+      } else {
+        showMessage("loginMsg", resp.message, "error");
+      }
+    }
 
-    if (resp.success) {
-      products.push(newProduct);
+    // ======================
+    // SHOP PROFILE
+    // ======================
+    async function loadShopProfile() {
+      const profile = await callWorker({ action: "getShopProfile", userId: currentUser.userId });
+      document.getElementById("shopName").value = profile.shopName;
+      document.getElementById("ownerName").value = currentUser.ownerName;
+      document.getElementById("phone").value = currentUser.phone;
+      document.getElementById("whatsapp").value = profile.whatsapp;
+      document.getElementById("location").value = profile.location;
+      document.getElementById("description").value = profile.description;
+    }
+
+    async function saveProfile() {
+      const profile = {
+        userId: currentUser.userId,
+        shopName: document.getElementById("shopName").value.trim(),
+        ownerName: currentUser.ownerName,
+        phone: currentUser.phone,
+        whatsapp: document.getElementById("whatsapp").value.trim(),
+        location: document.getElementById("location").value.trim(),
+        description: document.getElementById("description").value.trim()
+      };
+      if (!profile.shopName || !profile.location || !profile.description) {
+        showMessage("profileMsg", "Please fill all required fields.", "error");
+        return;
+      }
+
+      showMessage("profileMsg", "Saving...");
+      const resp = await callWorker({ action: "saveShopProfile", profile });
+      if (resp.success) showMessage("profileMsg", resp.message);
+      else showMessage("profileMsg", resp.message, "error");
+    }
+
+    // ======================
+    // PRODUCTS
+    // ======================
+    async function loadProducts() {
+      products = await callWorker({ action: "getProducts", userId: currentUser.userId });
       renderProducts();
-    } else {
-      document.getElementById("productMsg").innerHTML =
-        "<span class='error'>" + resp.message + "</span>";
     }
-  }
 
-  // Update product
-  async function updateProduct(itemNumber, field, value) {
-    const prod = products.find(p => p.itemNumber == itemNumber);
-    if (!prod) return;
-
-    prod[field] = value;
-    showMessage("productMsg", "Saving...");
-
-    await worker("saveProduct", {
-      userId: currentUser.userId,
-      product: prod
-    });
-  }
-
-  // Delete product
-  async function deleteProduct(itemNumber) {
-    showMessage("productMsg", "Deleting...");
-
-    const resp = await worker("deleteProduct", {
-      userId: currentUser.userId,
-      itemNumber
-    });
-
-    if (resp.success) {
-      products = products.filter(p => p.itemNumber != itemNumber);
-
-      products.forEach((p, i) => p.itemNumber = i + 1);
-
-      renderProducts();
-      showMessage("productMsg", resp.message);
+    function renderProducts() {
+      const tbody = document.querySelector("#productsTable tbody");
+      tbody.innerHTML = "";
+      products.forEach(p => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${p.itemNumber}</td>
+          <td><input class="inline-input" type="text" value="${p.itemName}" onchange="updateProduct(${p.itemNumber}, 'itemName', this.value)"></td>
+          <td><input class="inline-input" type="text" value="${p.itemDescription}" onchange="updateProduct(${p.itemNumber}, 'itemDescription', this.value)"></td>
+          <td><input class="inline-input" type="number" value="${p.price}" onchange="updateProduct(${p.itemNumber}, 'price', this.value)"></td>
+          <td><button onclick="deleteProduct(${p.itemNumber})">Delete</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
-  }
-</script>
 
+    async function addProduct() {
+      if (products.length >= 10) {
+        showMessage("productMsg", "Maximum 10 products allowed.", "error");
+        return;
+      }
+      const nextNumber = products.length + 1;
+      const newProduct = { itemNumber: nextNumber, itemName: "", itemDescription: "", price: "" };
+
+      showMessage("productMsg", "Saving...");
+      const resp = await callWorker({ action: "saveProduct", userId: currentUser.userId, product: newProduct });
+      if (resp.success) {
+        products.push(newProduct);
+        renderProducts();
+      } else {
+        showMessage("productMsg", resp.message, "error");
+      }
+    }
+
+    async function updateProduct(itemNumber, field, value) {
+      const prod = products.find(p => p.itemNumber == itemNumber);
+      if (!prod) return;
+      prod[field] = value;
+
+      showMessage("productMsg", "Saving...");
+      await callWorker({ action: "saveProduct", userId: currentUser.userId, product: prod });
+    }
+
+    async function deleteProduct(itemNumber) {
+      showMessage("productMsg", "Deleting...");
+      const resp = await callWorker({ action: "deleteProduct", userId: currentUser.userId, itemNumber });
+      if (resp.success) {
+        products = products.filter(p => p.itemNumber != itemNumber);
+        products.forEach((p, idx) => p.itemNumber = idx + 1);
+        renderProducts();
+        showMessage("productMsg", resp.message);
+      } else {
+        showMessage("productMsg", resp.message, "error");
+      }
+    }
+  </script>
 </body>
 </html>
