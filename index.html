@@ -119,7 +119,7 @@
     <div id="profileMsg"></div>
 
     <!-- Products -->
-    <h3>Products / Services (Max 20)</h3>
+    <h3>Products / Services (Max 50)</h3>
     <table id="productsTable">
       <thead>
         <tr>
@@ -248,8 +248,8 @@
     }
 
     async function addProduct() {
-      if (products.length >= 10) {
-        showMessage("productMsg", "Maximum 10 products allowed.", "error");
+      if (products.length >= 50) {
+        showMessage("productMsg", "Maximum 50 products allowed.", "error");
         return;
       }
       const nextNumber = products.length + 1;
