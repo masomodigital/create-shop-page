@@ -12,16 +12,18 @@
     button:hover { background-color: #1f4564; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     table, th, td { border: 1px solid #ddd; }
-    th, td { padding: 8px; text-align: left; }
+    th, td { padding: 8px; text-align: left; vertical-align: middle; }
     .hidden { display: none; }
     .inline-input { width: 90%; font-size: 16px; padding: 6px; }
     .error { color: red; }
     .success { color: green; font-weight: bold; }
+    img.thumbnail { width: 60px; height: auto; display: block; }
 
     /* Mobile adjustments */
     @media (max-width: 600px) {
       input, textarea, button, .inline-input { font-size: 18px; padding: 10px; }
       table, th, td { font-size: 16px; }
+      img.thumbnail { width: 50px; }
     }
 
     /* Bottom button container */
@@ -47,7 +49,6 @@
 
     .logout-btn { background-color: red; color: white; }
     .logout-btn:hover { background-color: #cc0000; }
-
   </style>
 </head>
 <body>
@@ -62,32 +63,32 @@
       <li>Whenever you sell airtime, an SMS with a link to your shop page is automatically sent to the customer.</li>
       <li>This means Masomo SMS App actively helps advertise your business and boost your sales.</li>
       <li>
-  You can also 
-  <a href="https://masomodigital.github.io/keywords/" target="_blank" 
-     style="display:inline-block; padding:4px 8px; background-color:#4CAF50; color:white; 
-            font-weight:600; font-size:0.9rem; border-radius:4px; text-decoration:none; margin:0 4px;">
-    CREATE YOUR CUSTOM KEYWORD
-  </a> 
-  and when customers send from their Safaricom line 
-  <span style="font-weight:bold; color:#1976D2;">MASOMO &lt;yourkeyword&gt; to 40015</span>, 
-  they will receive SMS with link to your shop webpage where you have listed your products and services.
-</li>
-</ul>
+        You can also 
+        <a href="https://masomodigital.github.io/keywords/" target="_blank" 
+           style="display:inline-block; padding:4px 8px; background-color:#4CAF50; color:white; 
+                  font-weight:600; font-size:0.9rem; border-radius:4px; text-decoration:none; margin:0 4px;">
+          CREATE YOUR CUSTOM KEYWORD
+        </a> 
+        and when customers send from their Safaricom line 
+        <span style="font-weight:bold; color:#1976D2;">MASOMO &lt;yourkeyword&gt; to 40015</span>, 
+        they will receive SMS with link to your shop webpage where you have listed your products and services.
+      </li>
+    </ul>
 
-<label for="nationalId" style="color: green; font-weight: bold; display: inline-block; width: 150px;">National ID/User ID</label>
-<input type="text" id="nationalId" placeholder="Enter National ID" required>
+    <label for="nationalId" style="color: green; font-weight: bold; display: inline-block; width: 150px;">National ID/User ID</label>
+    <input type="text" id="nationalId" placeholder="Enter National ID" required>
 
-<label for="password" style="color: green; font-weight: bold; display: inline-block; width: 150px;">Password</label>
-<input type="password" id="password" placeholder="Enter Password" required>
+    <label for="password" style="color: green; font-weight: bold; display: inline-block; width: 150px;">Password</label>
+    <input type="password" id="password" placeholder="Enter Password" required>
 
-<button onclick="login()">Login</button>
+    <button onclick="login()">Login</button>
 
-<!-- New red button for generating webpage & QR -->
-<button 
-  style="background-color: red; color: white; border: none; border-radius: 5px; padding: 10px 20px; font-weight: bold; margin-top: 10px; cursor: pointer;"
-  onclick="window.open('https://masomodigital.github.io/create-qr-and-url/', '_blank')">
-  GENERATE MY WEBPAGE LINK AND QR CODE
-</button>
+    <!-- New red button for generating webpage & QR -->
+    <button 
+      style="background-color: red; color: white; border: none; border-radius: 5px; padding: 10px 20px; font-weight: bold; margin-top: 10px; cursor: pointer;"
+      onclick="window.open('https://masomodigital.github.io/create-qr-and-url/', '_blank')">
+      GENERATE MY WEBPAGE LINK AND QR CODE
+    </button>
 
     <div id="loginMsg"></div>
   </div>
@@ -99,22 +100,22 @@
     <!-- Shop Profile -->
     <h3>SHOP PROFILE</h3>
     <label style="color: green; display: inline-block; width: 140px;">Shop Name</label>
-<input type="text" id="shopName">
+    <input type="text" id="shopName">
 
-<label style="color: green; display: inline-block; width: 140px;">Owner Name</label>
-<input type="text" id="ownerName" readonly>
+    <label style="color: green; display: inline-block; width: 140px;">Owner Name</label>
+    <input type="text" id="ownerName" readonly>
 
-<label style="color: green; display: inline-block; width: 140px;">Phone</label>
-<input type="text" id="phone" readonly>
+    <label style="color: green; display: inline-block; width: 140px;">Phone</label>
+    <input type="text" id="phone" readonly>
 
-<label style="color: green; display: inline-block; width: 140px;">WhatsApp Number</label>
-<input type="text" id="whatsapp">
+    <label style="color: green; display: inline-block; width: 140px;">WhatsApp Number</label>
+    <input type="text" id="whatsapp">
 
-<label style="color: green; display: inline-block; width: 140px;">Location</label>
-<input type="text" id="location">
+    <label style="color: green; display: inline-block; width: 140px;">Location</label>
+    <input type="text" id="location">
 
-<label style="color: green; display: inline-block; width: 140px;">Description</label>
-<textarea id="description" rows="3"></textarea>
+    <label style="color: green; display: inline-block; width: 140px;">Description</label>
+    <textarea id="description" rows="3"></textarea>
     <button onclick="saveProfile()">Save Profile</button>
     <div id="profileMsg"></div>
 
@@ -127,6 +128,7 @@
           <th>Item Name</th>
           <th>Description</th>
           <th>Price (KSh.)</th>
+          <th>Thumbnail</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -241,6 +243,10 @@
           <td><input class="inline-input" type="text" value="${p.itemName}" onchange="updateProduct(${p.itemNumber}, 'itemName', this.value)"></td>
           <td><input class="inline-input" type="text" value="${p.itemDescription}" onchange="updateProduct(${p.itemNumber}, 'itemDescription', this.value)"></td>
           <td><input class="inline-input" type="number" value="${p.price}" onchange="updateProduct(${p.itemNumber}, 'price', this.value)"></td>
+          <td>
+            <input type="file" accept="image/*" onchange="uploadThumbnail(${p.itemNumber}, this)">
+            ${p.itemImage ? `<img src="${p.itemImage}" class="thumbnail">` : ''}
+          </td>
           <td><button onclick="deleteProduct(${p.itemNumber})">Delete</button></td>
         `;
         tbody.appendChild(tr);
@@ -285,6 +291,36 @@
       } else {
         showMessage("productMsg", resp.message, "error");
       }
+    }
+
+    // ======================
+    // UPLOAD THUMBNAIL
+    // ======================
+    async function uploadThumbnail(itemNumber, inputElem) {
+      if (!inputElem.files || inputElem.files.length === 0) return;
+      const file = inputElem.files[0];
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        showMessage("productMsg", "Uploading image...");
+        const base64Data = e.target.result;
+        const resp = await callWorker({
+          action: "uploadProductImage",
+          userId: currentUser.userId,
+          itemNumber,
+          imageData: base64Data
+        });
+
+        if (resp.success) {
+          const prod = products.find(p => p.itemNumber == itemNumber);
+          prod.itemImage = resp.imageUrl;
+          renderProducts();
+          showMessage("productMsg", "Thumbnail uploaded successfully.");
+        } else {
+          showMessage("productMsg", resp.message, "error");
+        }
+      };
+      reader.readAsDataURL(file);
     }
 
     // ======================
