@@ -168,29 +168,47 @@
       }
     }
 
-    // ======================
-    // LOGIN
-    // ======================
-    async function login() {
-      const nationalId = document.getElementById("nationalId").value.trim();
-      const password = document.getElementById("password").value.trim();
-      if (!nationalId || !password) return;
+  // ======================
+// LOGIN
+// ======================
+async function login() {
+  const nationalId = document.getElementById("nationalId").value.trim();
+  const password = document.getElementById("password").value.trim();
+  if (!nationalId || !password) return;
 
-      showMessage("loginMsg", "Processing...");
+  showMessage("loginMsg", "Processing...");
 
-      const resp = await callWorker({ action: "login", nationalId, password });
-      if (resp.success) {
-        currentUser = resp;
-        document.getElementById("loginDiv").classList.add("hidden");
-        document.getElementById("dashboardDiv").classList.remove("hidden");
-        document.getElementById("welcomeMsg").innerText = "Welcome " + resp.ownerName;
-        loadShopProfile();
-        loadProducts();
-      } else {
-        showMessage("loginMsg", resp.message, "error");
-      }
+  const resp = await callWorker({ action: "login", nationalId, password });
+  if (resp.success) {
+    currentUser = resp;
+
+    // Check SMS credits
+    if (currentUser.smsCredits < 20) {
+      document.getElementById("loginMsg").innerHTML = `
+        <span class="error">
+          You should have 20+ SMS Credits to view this page.
+          Click below to buy SMS Credits and continue!
+        </span>
+        <div style="margin-top:10px;">
+          <a href="https://masomodigital.github.io/BUY-CREDITS-PAGE/" 
+             class="visit-btn" style="background-color:green; color:white; padding:10px 15px; border-radius:5px; text-decoration:none; font-weight:bold;">
+            BUY SMS CREDITS
+          </a>
+        </div>
+      `;
+      return; // Stop login flow
     }
 
+    // If enough credits, show dashboard
+    document.getElementById("loginDiv").classList.add("hidden");
+    document.getElementById("dashboardDiv").classList.remove("hidden");
+    document.getElementById("welcomeMsg").innerText = "Welcome " + resp.ownerName;
+    loadShopProfile();
+    loadProducts();
+  } else {
+    showMessage("loginMsg", resp.message, "error");
+  }
+}
     // ======================
     // SHOP PROFILE
     // ======================
